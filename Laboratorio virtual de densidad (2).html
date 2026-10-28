@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratorio virtual de densidad</title>
+<style>
+:root{--bg:#eef2f6;--pn:#fff;--fg:#14212e;--mut:#556575;--ln:#cbd6e0;--ac:#1f6fb5;--ac2:#e3effa;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1720;--pn:#17222e;--fg:#e6edf4;--mut:#9fb0c0;--ln:#2b3a49;--ac:#5aa6e8;--ac2:#1c3248;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1720;--pn:#17222e;--fg:#e6edf4;--mut:#9fb0c0;--ln:#2b3a49;--ac:#5aa6e8;--ac2:#1c3248;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 "Segoe UI",system-ui,-apple-system,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;background:var(--pn);border-bottom:1px solid var(--ln)}
+h1{font-size:1.15rem;margin:0;font-weight:700}
+header p{margin:0;color:var(--mut);font-size:.85rem}
+.wrap{display:grid;grid-template-columns:200px 1fr;gap:12px;padding:12px;max-width:1280px;margin:auto}
+aside,.stage{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:10px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px}
+button{font:inherit;color:var(--fg);background:var(--pn);border:1px solid var(--ln);border-radius:8px;padding:7px 11px;cursor:pointer}
+button:hover:not(:disabled){border-color:var(--ac)}
+button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+.tabs button[aria-selected="true"]{background:var(--ac);color:#fff;border-color:var(--ac)}
+#list{display:grid;gap:6px}
+.smp{display:flex;align-items:center;gap:8px;text-align:left}
+.smp[aria-pressed="true"]{background:var(--ac2);border-color:var(--ac)}
+.smp svg{flex:none;background:#eef3f7;border-radius:6px}
+#hint{margin:0 0 8px;padding:8px 12px;border-left:4px solid var(--ac);background:var(--ac2);border-radius:4px;min-height:2.4em;font-weight:600}
+#sc{width:100%;height:auto;display:block;border-radius:8px;touch-action:none;user-select:none;-webkit-user-select:none}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ctl button[hidden]{display:none}
+footer{text-align:center;color:var(--mut);font-size:.8rem;padding:4px 0 14px}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;padding:8px}#list{grid-template-columns:1fr 1fr}header p{display:none}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style></head>
+<body>
+<header><div><h1>Laboratorio virtual de densidad</h1><p>Física y Química · 2.º ESO</p></div><button id="bLab">Reiniciar laboratorio</button></header>
+<div class="wrap">
+<aside aria-label="Muestras"><div class="tabs" role="tablist"><button role="tab" id="tS" aria-selected="true">Sólidos</button><button role="tab" id="tL" aria-selected="false">Líquidos</button></div><div id="list"></div></aside>
+<main class="stage">
+<p id="hint" aria-live="polite"></p>
+<svg id="sc" viewBox="0 0 900 520" role="img" aria-label="Mesa de laboratorio con balanza, probeta graduada y lupa">
+<defs>
+<linearGradient id="gW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fa"/><stop offset="1" stop-color="#e1e9f0"/></linearGradient>
+<linearGradient id="gT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cdd8e1"/><stop offset="1" stop-color="#aebdca"/></linearGradient>
+<linearGradient id="gBal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fb"/><stop offset="1" stop-color="#b9c4cf"/></linearGradient>
+<linearGradient id="gTop" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e3e9ee"/><stop offset="1" stop-color="#fbfcfd"/></linearGradient>
+<linearGradient id="gSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0f3f6"/><stop offset=".5" stop-color="#aab5c0"/><stop offset="1" stop-color="#6c7a88"/></linearGradient>
+<linearGradient id="gStone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b0b6bb"/><stop offset="1" stop-color="#686f76"/></linearGradient>
+<linearGradient id="gNut" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef2f5"/><stop offset=".5" stop-color="#a3adb7"/><stop offset="1" stop-color="#76828d"/></linearGradient>
+<radialGradient id="gClay" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#f7a574"/><stop offset="1" stop-color="#cf4f20"/></radialGradient>
+<radialGradient id="mA" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#e8f3ff"/><stop offset="1" stop-color="#2f78d0" stop-opacity=".85"/></radialGradient>
+<radialGradient id="mB" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#eaffef"/><stop offset="1" stop-color="#2fa35a" stop-opacity=".85"/></radialGradient>
+<radialGradient id="mC" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffecef"/><stop offset="1" stop-color="#d23c5a" stop-opacity=".85"/></radialGradient>
+<radialGradient id="mD" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff8e0"/><stop offset="1" stop-color="#e0a21b" stop-opacity=".85"/></radialGradient>
+<linearGradient id="gGl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".3" stop-color="#dcecf8" stop-opacity=".18"/><stop offset="1" stop-color="#b6d0e4" stop-opacity=".3"/></linearGradient>
+<clipPath id="lc"><circle r="76"/></clipPath>
+</defs>
+<rect width="900" height="520" fill="url(#gW)"/>
+<rect y="446" width="900" height="74" fill="url(#gT)"/><rect y="446" width="900" height="3" fill="#92a4b3"/>
+<ellipse cx="380" cy="449" rx="52" ry="6" fill="#e6edf3" stroke="#aebdca"/>
+<ellipse cx="170" cy="451" rx="132" ry="6" fill="#000" opacity=".15"/>
+<polygon points="72,396 268,396 290,410 50,410" fill="url(#gTop)" stroke="#a9b5c0"/>
+<rect x="50" y="410" width="240" height="36" rx="4" fill="url(#gBal)" stroke="#97a5b2"/>
+<rect x="150" y="390" width="40" height="8" fill="#8c98a3"/>
+<rect x="106" y="388" width="128" height="5" rx="2" fill="#8a96a2"/>
+<ellipse cx="170" cy="388" rx="64" ry="7" fill="url(#gSteel)" stroke="#6c7a88"/>
+<g id="dyn"></g>
+</svg>
+<div class="ctl">
+<button id="bOn">Encender balanza</button><button id="bTare">Tara</button>
+
+<button id="bPour" hidden>Verter líquido</button>
+<button id="bShape" hidden>Cambiar forma</button>
+<button id="bReset">Reiniciar muestra</button>
+</div>
+</main></div>
+<footer>Samuel López Melián</footer>
+<script>
+const $=q=>document.querySelector(q);
+const SOL={piedra:{n:'Piedra',m:64.8,v0:60,vs:24},tuercas:{n:'Tuercas',m:78.0,v0:70,vs:10},canicas:{n:'Canicas',m:50.0,v0:80,vs:20},plastilina:{n:'Plastilina',m:23.8,v0:100,vs:14}};
+const LIQ={agua:{n:'Agua',d:1.0,col:'rgba(48,130,226,.55)',c2:'#3b82e0'},aceite:{n:'Aceite',d:.92,col:'rgba(235,190,40,.68)',c2:'#e3b61f'}};
+const CX=560,TY=446,VESS=45.0,NEXT={tray:'bal',bal:'cyl',cyl:'tray'};
+const F=x=>x.toFixed(1).replace('.',',');
+const fresh=()=>({tab:'s',id:null,on:false,tare:0,where:'tray',flat:0,flatT:0,liqV:0,cylBal:false,lvl:60,ox:380,oy:TY,os:1,path:[],pour:null,rip:0,stab:0,last:0,cx:0,cy:0});
+let S=fresh(),dr=null,dirty=true,B=false;
+const svg=$('#sc'),dyn=$('#dyn');
+
+/* ---------- Muestras ---------- */
+const nut=(x,y,r)=>{let p='';for(let i=0;i<6;i++){const a=i*Math.PI/3;p+=(x+r*Math.cos(a)).toFixed(1)+','+(y+r*Math.sin(a)).toFixed(1)+' '}
+ return `<polygon points="${p}" fill="url(#gNut)" stroke="#59646f" stroke-width="1.3"/><circle cx="${x}" cy="${y}" r="${r*.44}" fill="#3d4851" stroke="#c9d1d8"/><path d="M${x-r*.7} ${y-r*.5}L${x-r*.2} ${y-r*.85}" stroke="#fff" stroke-width="2" opacity=".8"/>`};
+const mb=(x,y,g)=>`<circle cx="${x}" cy="${y}" r="11" fill="url(#m${g})" stroke="#fff" stroke-opacity=".6"/><ellipse cx="${x-4}" cy="${y-4.5}" rx="3.2" ry="2" fill="#fff" opacity=".9"/>`;
+function shape(id,f){
+ if(id=='piedra')return `<path d="M-32 0L-35-13-24-29-6-37 15-33 31-20 35-5 26 0Z" fill="url(#gStone)" stroke="#555c63" stroke-width="1.5" stroke-linejoin="round"/><path d="M-24-29L-8-18 10-22 15-33M-8-18L-12-2M10-22L28-12" stroke="#585f66" fill="none" opacity=".6"/><g fill="#e1e5e8" opacity=".75"><circle cx="-14" cy="-24" r="1.5"/><circle cx="8" cy="-10" r="1.3"/><circle cx="22" cy="-24" r="1.4"/><circle cx="-22" cy="-8" r="1.2"/></g>`;
+ if(id=='tuercas')return nut(-20,-15,16)+nut(20,-15,16)+nut(0,-37,16);
+ if(id=='canicas')return mb(-24,-11,'A')+mb(-2,-11,'B')+mb(20,-11,'C')+mb(-13,-30,'D');
+ const rx=22+12*f,ry=22-13*f;
+ return `<ellipse cx="0" cy="${-ry}" rx="${rx}" ry="${ry}" fill="url(#gClay)" stroke="#b0431b"/><ellipse cx="${-rx*.35}" cy="${-ry*1.35}" rx="${rx*.3}" ry="${Math.max(1.5,ry*.18)}" fill="#fff" opacity=".4"/><path d="M${-rx*.5} ${-ry*.6}Q0 ${-ry*.3} ${rx*.5} ${-ry*.6}" stroke="#b0431b" fill="none" opacity=".35"/>`}
+const flask=c=>`<svg viewBox="0 0 40 40" width="44" height="30"><path d="M15 4h10v10l9 18a3 3 0 0 1-3 4H9a3 3 0 0 1-3-4l9-18z" fill="#eef5fb" stroke="#6f8aa0" stroke-width="2"/><path d="M11 26h18l3 6a2 2 0 0 1-2 3H10a2 2 0 0 1-2-3z" fill="${c}"/></svg>`;
+function buildList(){
+ const L=$('#list');
+ L.innerHTML=S.tab=='s'?Object.keys(SOL).map(k=>`<button class="smp" data-id="${k}" aria-pressed="${S.id==k}"><svg viewBox="-42 -46 84 52" width="44" height="30">${shape(k,0)}</svg>${SOL[k].n}</button>`).join(''):
+  Object.keys(LIQ).map(k=>`<button class="smp" data-id="${k}" aria-pressed="${S.id==k}">${flask(LIQ[k].c2)}${LIQ[k].n}</button>`).join('');
+}
+function pick(id){const o={on:S.on,tab:S.tab,lvl:S.lvl};S=fresh();S.on=o.on;S.tab=o.tab;S.lvl=o.lvl;S.id=id;buildList();dirty=true;
+ try{localStorage.setItem('dens1',JSON.stringify({tab:S.tab,id}))}catch(e){}}
+function setTab(t){const on=S.on,l=S.lvl;S=fresh();S.on=on;S.tab=t;S.lvl=l;$('#tS').setAttribute('aria-selected',t=='s');$('#tL').setAttribute('aria-selected',t=='l');buildList();dirty=true}
+
+/* ---------- Lógica ---------- */
+const load=()=>S.tab=='s'?(S.id&&S.where=='bal'&&!(dr&&dr.k=='o'&&dr.m)?SOL[S.id].m:0):(S.id&&S.cylBal?VESS+S.liqV*LIQ[S.id].d:0);
+const levelT=()=>S.tab=='s'?(S.id?SOL[S.id].v0+(S.where=='cyl'&&S.path.length<=1?SOL[S.id].vs:0):60):S.liqV;
+const objT=()=>S.where=='tray'?[380,TY,1]:S.where=='bal'?[170,388,1]:[CX,431,.55];
+function setWhere(w){const was=S.where;S.where=w;
+ S.path=(w=='cyl'&&was!='cyl')||(was=='cyl'&&w!='cyl')?[[CX,95,.7],objT()]:[objT()];dirty=true}
+function toggleOn(){S.on=!S.on;if(!S.on)S.tare=0;else S.stab=performance.now()+700;dirty=true}
+function tare(){if(!S.on)return;S.tare=load();S.stab=performance.now()+500;dirty=true}
+function move(){if(!S.id)return;if(S.tab=='s')setWhere(NEXT[S.where]);else S.cylBal=!S.cylBal;dirty=true}
+function pourNow(){if(S.tab=='l'&&S.id&&!S.pour&&S.liqV<100){S.pour={t:0,d:0};dirty=true}}
+function shapeToggle(){if(S.id=='plastilina'&&S.where!='cyl'){S.flatT=S.flatT?0:1;dirty=true}}
+function act(a){a=='on'?toggleOn():tare()}
+
+function step(dt,t){B=false;const k=1-Math.exp(-dt*8),mv=(a,b,kk)=>{const d=b-a;if(Math.abs(d)<.05)return b;B=true;return a+d*kk};
+ if(!(dr&&dr.k=='o')&&S.path.length){const p=S.path[0],k2=1-Math.exp(-dt*(S.path.length>1||S.where!='cyl'?9:5));
+  S.ox+=(p[0]-S.ox)*k2;S.oy+=(p[1]-S.oy)*k2;S.os+=(p[2]-S.os)*k2;B=true;
+  if(Math.hypot(p[0]-S.ox,p[1]-S.oy)<3){S.ox=p[0];S.oy=p[1];S.os=p[2];S.path.shift();if(S.where=='cyl'&&S.path.length==1)S.rip=1}}
+ if(dr&&dr.k=='o'&&dr.m)S.os=mv(S.os,1,k);
+ const T=levelT();S.lvl=Math.abs(T-S.lvl)<.03?T:(B=true,S.lvl+(T-S.lvl)*(1-Math.exp(-dt*3.2)));
+ if(S.rip>0){S.rip=Math.max(0,S.rip-dt*.7);B=true}
+ S.flat=mv(S.flat,S.flatT,k);
+ if(!(dr&&dr.k=='c')){S.cx=mv(S.cx,S.cylBal?-390:0,k);S.cy=mv(S.cy,S.cylBal?-58:0,k)}
+ if(S.pour){S.pour.t+=dt/1.5;B=true;if(!S.pour.d&&S.pour.t>.3){S.pour.d=1;S.liqV+=10}if(S.pour.t>=1)S.pour=null}
+ const L=load();if(L!==S.last){S.last=L;S.stab=t+900}
+ if(t<S.stab){B=true;S.sd=1}else if(S.sd){S.sd=0;B=true}}
+
+/* ---------- Dibujo ---------- */
+const wcol=()=>S.tab=='l'&&S.id?LIQ[S.id].col:'rgba(48,130,226,.55)';
+const yv=v=>432-2*v;
+function cylBack(t){
+ const L=S.lvl,y=yv(L),wob=Math.sin(t/60)*S.rip*1.6+Math.sin(t/90)*Math.min(1,Math.abs(levelT()-L)/4);
+ let s=`<g transform="translate(${S.cx.toFixed(1)},${S.cy.toFixed(1)})" ${S.tab=='l'&&S.id?'data-cyl style="cursor:grab"':''}>`;
+ s+=`<ellipse cx="${CX}" cy="448" rx="50" ry="4" fill="#000" opacity=".16"/><path d="M512 446Q512 436 530 434H590Q608 436 608 446Z" fill="url(#gSteel)" stroke="#6c7a88"/>`;
+ s+=`<rect x="534" y="122" width="52" height="312" rx="3" fill="#e9f3fb" fill-opacity=".4"/>`;
+ if(L>.3)s+=`<path d="M535 ${y-2.5}Q${CX} ${y+2.5+wob} 585 ${y-2.5}V432H535Z" fill="${wcol()}"/><path d="M535 ${y-2.5}Q${CX} ${y+2.5+wob} 585 ${y-2.5}" stroke="#fff" stroke-opacity=".7" fill="none"/>`;
+ if(S.rip>0)for(let i=0;i<2;i++){const r=Math.min(24,(1-S.rip)*26+i*8);s+=`<ellipse cx="${CX}" cy="${y}" rx="${r}" ry="${r*.18}" fill="none" stroke="#fff" stroke-opacity="${(S.rip*.7).toFixed(2)}"/>`}
+ return s+'</g>'}
+function cylFront(){
+ let s=`<g transform="translate(${S.cx.toFixed(1)},${S.cy.toFixed(1)})" pointer-events="none">`;
+ for(let v=0;v<=150;v+=2){const M=v%10==0,y=yv(v);s+=`<line x1="534" x2="${M?548:541}" y1="${y}" y2="${y}" stroke="#2b3b4b" stroke-width="${M?1.4:1}"/>`;
+  if(M&&v>0)s+=`<text x="529" y="${y+3.8}" text-anchor="end" font-size="11" font-weight="600" fill="#2b3b4b" font-family="system-ui,Arial,sans-serif">${v}</text>`}
+ s+=`<text x="534" y="112" font-size="11" fill="#2b3b4b" font-family="system-ui,Arial,sans-serif">mL</text>`;
+ s+=`<rect x="534" y="122" width="52" height="312" rx="3" fill="url(#gGl)"/><rect x="574" y="128" width="4" height="296" fill="#fff" opacity=".4"/><path d="M531 119H589" stroke="#7d98ae" stroke-width="4" stroke-linecap="round"/><path d="M534 122V430Q534 434 538 434H582Q586 434 586 430V122" fill="none" stroke="#7d98ae" stroke-width="2"/>`;
+ return s+'</g>'}
+function objSVG(){
+ if(S.tab!='s'||!S.id)return '';
+ return `<g data-obj style="cursor:grab" transform="translate(${S.ox.toFixed(1)},${S.oy.toFixed(1)}) scale(${S.os.toFixed(3)})"><rect x="-42" y="-48" width="84" height="50" fill="transparent"/>${shape(S.id,S.flat)}</g>`}
+function lens(t){
+ const L=S.lvl,K=8,wob=Math.sin(t/60)*S.rip*1.6;
+ let c=`<rect x="-90" y="-90" width="180" height="180" fill="#f5f9fc"/><rect x="-18" y="-90" width="70" height="180" fill="#dcebf6" opacity=".6"/>`;
+ if(L>.3)c+=`<path d="M-18 -5Q17 ${5+wob} 52 -5V100H-18Z" fill="${wcol()}"/><path d="M-18 -5Q17 ${5+wob} 52 -5" stroke="#fff" stroke-opacity=".8" stroke-width="2" fill="none"/>`;
+ else c+=`<rect x="-18" y="${L*K}" width="70" height="100" fill="#b9c8d4"/>`;
+ for(let v=2*Math.ceil(Math.max(0,L-12)/2);v<=Math.min(150,L+12);v+=2){const y=((L-v)*K).toFixed(1),M=v%10==0;
+  c+=`<line x1="-18" x2="${M?-1:-9}" y1="${y}" y2="${y}" stroke="#1d2b3a" stroke-width="${M?2.2:1.4}"/>`;
+  if(M&&v>0&&Math.abs(y)<=55)c+=`<text x="-25" y="${(+y+5.5).toFixed(1)}" text-anchor="end" font-size="16" font-weight="700" fill="#1d2b3a" font-family="system-ui,Arial,sans-serif">${v}</text>`}
+ c+=`<path d="M-18-90V90M52-90V90" stroke="#6f8aa0" stroke-width="3"/>`;
+ return `<g transform="translate(765,190)"><g transform="rotate(48)"><rect x="76" y="-9" width="74" height="18" rx="9" fill="#37465a"/><rect x="76" y="-9" width="22" height="18" fill="#9aa9b8"/></g><circle r="80" fill="#fff" opacity=".4"/><g clip-path="url(#lc)">${c}</g><circle r="78" fill="none" stroke="url(#gSteel)" stroke-width="6"/><path d="M-56-34A66 66 0 0 1-22-62" stroke="#fff" stroke-opacity=".75" stroke-width="5" fill="none" stroke-linecap="round"/></g>`}
+function bottle(){
+ if(S.tab!='l'||!S.id)return '';
+ const lq=LIQ[S.id];let e=0,mx=CX+S.cx+8,my=112+S.cy;
+ if(S.pour){const t=S.pour.t;e=t<.25?t/.25:t<.8?1:(1-t)/.2;e=e*e*(3-2*e)}
+ const bx=690+(mx-690)*e,by=336+(my-336)*e,rot=-72*e;let st='';
+ if(S.pour&&S.pour.t>.3&&S.pour.t<.8)st=`<line x1="${mx}" x2="${mx}" y1="${my}" y2="${yv(S.lvl)+S.cy}" stroke="${lq.c2}" stroke-width="4" stroke-opacity=".75"/>`;
+ return st+`<g data-bottle style="cursor:pointer" transform="translate(${bx.toFixed(1)},${by.toFixed(1)}) rotate(${rot.toFixed(1)})"><path d="M-8 0h16v20c0 8 22 10 22 30v52a6 6 0 0 1-6 6h-48a6 6 0 0 1-6-6V50c0-20 22-22 22-30z" fill="#e8f2f9" fill-opacity=".8" stroke="#7d98ae" stroke-width="2"/><path d="M-30 60H30v42a6 6 0 0 1-6 6h-48a6 6 0 0 1-6-6z" fill="${lq.col}"/><rect x="-20" y="72" width="40" height="20" rx="2" fill="#fff" opacity=".9"/><text x="0" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#1d2b3a" font-family="system-ui,Arial,sans-serif">${lq.n}</text></g>`}
+function balUI(t){
+ let txt=null;
+ if(S.on){if(t<S.stab)txt='·'.repeat(Math.floor(t/160)%4+1);else{let v=load()-S.tare;if(Math.abs(v)<.05)v=0;txt=F(v)+' g'}}
+ return `<rect x="72" y="414" width="132" height="28" rx="3" fill="#232d2a" stroke="#0f1513"/><rect x="75" y="417" width="126" height="22" rx="2" fill="${S.on?'#c3d6a4':'#2f3d37'}"/>${txt!==null?`<text x="196" y="434" text-anchor="end" font-size="18" font-weight="700" fill="#233020" font-family="ui-monospace,Consolas,Menlo,monospace">${txt}</text>`:''}
+<g data-act="on" style="cursor:pointer"><rect x="212" y="418" width="30" height="22" rx="5" fill="${S.on?'#3d9c5a':'#7d8b97'}" stroke="#4a5763"/><text x="227" y="433" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="system-ui,Arial,sans-serif">ON</text></g>
+<g data-act="tare" style="cursor:pointer"><rect x="248" y="418" width="36" height="22" rx="5" fill="#5f7184" stroke="#3f4d5a" opacity="${S.on?1:.6}"/><text x="266" y="433" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="system-ui,Arial,sans-serif">TARA</text></g>`}
+function hint(t){
+ if(!S.id)return S.tab=='s'?'Selecciona una muestra.':'Selecciona un líquido.';
+ if(!S.on)return 'Enciende la balanza.';
+ const stab=t<S.stab;
+ if(S.tab=='s'){
+  if(S.where=='tray')return 'Arrastra el objeto al instrumento que necesites.';
+  if(S.where=='bal')return stab?'Espera a que la lectura se estabilice.':'Anota la masa en tu ficha. Observa el volumen inicial y luego introduce el objeto en la probeta.';
+  return Math.abs(levelT()-S.lvl)>.1?'El agua está subiendo…':'Lee el volumen final con ayuda de la lupa. Anota las medidas en tu ficha.'}
+ if(S.pour)return 'Vertiendo…';
+ if(!S.cylBal)return S.tare?'Coloca el recipiente sobre la balanza.':'Arrastra el recipiente graduado vacío hasta la balanza.';
+ if(stab)return 'Espera a que la lectura se estabilice.';
+ if(!S.tare&&!S.liqV)return 'Observa la masa del recipiente y pulsa TARA.';
+ if(!S.liqV)return 'Vierte una cantidad de líquido.';
+ return 'Lee la masa y el volumen en el recipiente. Anótalos en tu ficha.'}
+let lastHint='';
+function render(t){
+ dyn.innerHTML=cylBack(t)+objSVG()+cylFront()+bottle()+balUI(t)+lens(t);
+ const h=hint(t);if(h!==lastHint){$('#hint').textContent=h;lastHint=h}
+ $('#bOn').textContent=S.on?'Apagar balanza':'Encender balanza';
+ $('#bTare').disabled=!S.on;
+ 
+ $('#bPour').hidden=S.tab!='l';$('#bPour').disabled=!S.id||!!S.pour||S.liqV>=100;
+ $('#bShape').hidden=S.id!='plastilina';$('#bShape').disabled=S.where=='cyl';
+ $('#bReset').disabled=!S.id}
+
+/* ---------- Eventos ---------- */
+const pt=e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())};
+svg.addEventListener('pointerdown',e=>{
+ const a=e.target.closest('[data-act]');if(a){act(a.dataset.act);e.preventDefault();return}
+ if(e.target.closest('[data-bottle]')){pourNow();return}
+ const p=pt(e);
+ if(e.target.closest('[data-obj]')&&S.tab=='s'&&S.id){dr={k:'o',x:p.x,y:p.y,dx:S.ox-p.x,dy:S.oy-p.y,m:0};S.path=[]}
+ else if(e.target.closest('[data-cyl]')&&S.tab=='l'&&S.id)dr={k:'c',x:p.x,y:p.y,dx:S.cx-p.x,dy:S.cy-p.y,m:0};
+ if(dr){try{svg.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault()}});
+svg.addEventListener('pointermove',e=>{if(!dr)return;const p=pt(e);
+ if(Math.hypot(p.x-dr.x,p.y-dr.y)>6)dr.m=1;
+ if(dr.m){if(dr.k=='o'){S.ox=p.x+dr.dx;S.oy=p.y+dr.dy}else{S.cx=p.x+dr.dx;S.cy=p.y+dr.dy}}dirty=true});
+function up(){if(!dr)return;const d=dr;dr=null;
+ if(d.k=='o'){if(!d.m)setWhere(S.where);else{const x=S.ox,y=S.oy;
+  setWhere(Math.abs(x-170)<90&&y>270?'bal':Math.abs(x-CX)<50&&y<440?'cyl':'tray')}}
+ else S.cylBal=d.m?(S.cx+CX<360):S.cylBal;
+ dirty=true}
+svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);
+$('#list').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)pick(b.dataset.id)});
+$('#tS').onclick=()=>setTab('s');$('#tL').onclick=()=>setTab('l');
+$('#bOn').onclick=toggleOn;$('#bTare').onclick=tare;$('#bPour').onclick=pourNow;$('#bShape').onclick=shapeToggle;
+$('#bReset').onclick=()=>{if(S.id)pick(S.id)};
+$('#bLab').onclick=()=>{S=fresh();setTab('s');try{localStorage.removeItem('dens1')}catch(e){}};
+
+/* ---------- Bucle ---------- */
+let t0=performance.now();
+function loop(t){const dt=Math.min(.05,(t-t0)/1000);t0=t;step(dt,t);if(B||dirty){render(t);dirty=false}requestAnimationFrame(loop)}
+try{const sv=JSON.parse(localStorage.getItem('dens1')||'null');
+ if(sv&&sv.id&&((sv.tab=='s'&&SOL[sv.id])||(sv.tab=='l'&&LIQ[sv.id]))){setTab(sv.tab);pick(sv.id)}else buildList()}catch(e){buildList()}
+requestAnimationFrame(loop);
+</script></body></html>
